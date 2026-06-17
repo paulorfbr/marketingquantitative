@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__cachebro__read_file",
+      "mcp__cachebro__read_files",
+      "Bash(powershell -NonInteractive -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -PathsOnly)",
+      "Bash(powershell -NonInteractive -File \".specify/scripts/powershell/setup-plan.ps1\" -Json)",
+      "Bash(powershell -NonInteractive -File \".specify/integrations/claude/scripts/update-context.ps1\" -AgentType claude)",
+      "Bash(powershell -NonInteractive -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
+      "Bash(powershell -NonInteractive -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(mvn compile:*)",
+      "Bash(java:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(mvn -version)",
+      "Bash(mvn test:*)",
+      "Bash(code *)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(claude mcp *)",
+      "Skill(update-config)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\User\\\\IdeaProjects\\\\MarketingQuantitative\\\\frontend\\\\next.config.ts\" -Force)"
+    ]
+  }
+}
