@@ -7,6 +7,13 @@ import {
   type QueueInputs,
   type QueueResult,
 } from '@/lib/queue';
+import { SessionHistory, type SessionRow } from '@/components/shared/SessionHistory';
+
+const HISTORY_COLUMNS = [
+  { key: 'utilization', label: 'Utilisation', format: (v: unknown) => `${((v as number) * 100).toFixed(1)}%` },
+  { key: 'l',  label: 'L (system)' },
+  { key: 'lq', label: 'Lq (queue)' },
+];
 
 type FormState = { arrivalRate: string; serviceRate: string; servers: string };
 type FieldErrors = Partial<Record<keyof FormState, string>>;
@@ -17,6 +24,9 @@ export default function QueueClient() {
   const [result, setResult]       = useState<QueueResult | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [crossError, setCrossError]   = useState<string | null>(null);
+  const [sessionName, setSessionName] = useState('');
+  const [saveStatus, setSaveStatus]   = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [historyKey, setHistoryKey]   = useState(0);
 
   const update = (field: keyof FormState, value: string) => {
     setForm(f => ({ ...f, [field]: value }));
@@ -64,6 +74,44 @@ export default function QueueClient() {
     setResult(null);
     setFieldErrors({});
     setCrossError(null);
+    setSaveStatus('idle');
+  };
+
+  const saveSession = async () => {
+    if (!result) return;
+    const name = sessionName.trim() || new Date().toLocaleString();
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/queue/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          arrivalRate: Number(form.arrivalRate),
+          serviceRate: Number(form.serviceRate),
+          servers:     Number(form.servers),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setSaveStatus('saved');
+      setHistoryKey(k => k + 1);
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
+
+  const loadSession = (session: SessionRow) => {
+    setForm({
+      arrivalRate: String(session.arrivalRate ?? ''),
+      serviceRate: String(session.serviceRate ?? ''),
+      servers:     String(session.servers ?? ''),
+    });
+    setResult(null);
+    setFieldErrors({});
+    setCrossError(null);
+    setSaveStatus('idle');
   };
 
   return (
@@ -223,6 +271,44 @@ export default function QueueClient() {
           </div>
         </>
       )}
+
+      {/* Save session */}
+      {result && (
+        <div className="card" style={{ marginTop: 'var(--space-6)' }}>
+          <h2 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)' }}>
+            Save Session
+          </h2>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={sessionName}
+              onChange={e => setSessionName(e.target.value)}
+              placeholder="Session name (optional)"
+              style={{ flex: 1 }}
+            />
+            <button
+              onClick={saveSession}
+              className="btn btn-primary"
+              disabled={saveStatus === 'saving'}
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved ✓' : 'Save'}
+            </button>
+          </div>
+          {saveStatus === 'error' && (
+            <p className="field-error" style={{ marginTop: 'var(--space-2)' }}>
+              Could not reach the backend. Is the server running?
+            </p>
+          )}
+        </div>
+      )}
+
+      <SessionHistory
+        apiPath="/api/queue/sessions"
+        refreshKey={historyKey}
+        columns={HISTORY_COLUMNS}
+        onLoad={loadSession}
+      />
     </div>
   );
 }

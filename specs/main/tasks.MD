@@ -103,3 +103,20 @@ Priority: **P1** = must-have for v1.0 · **P2** = nice-to-have
 | T-06.3 | [x] CORS configuration on Spring Boot for local frontend dev | P2 | backend |
 | T-06.4 | [x] OpenAPI / Swagger UI auto-generation | P2 | backend |
 | T-06.5 | [x] E2E smoke test for each tool's happy path | P2 | test |
+
+---
+
+## Milestone 7 — Persistence
+
+| # | Task | Priority | Layer |
+|---|------|----------|-------|
+| T-07.1 | [x] Flyway migration: eoq_session, breakeven_session, queue_session tables | P1 | backend |
+| T-07.2 | [x] JPA entities + Spring Data repositories for all three session types | P1 | backend |
+| T-07.3 | [x] EOQ session save / list / get — EoqSessionService + DTOs + controller endpoints | P1 | backend |
+| T-07.4 | [x] Break-even session save / list / get — BreakevenSessionService + DTOs + endpoints | P1 | backend |
+| T-07.5 | [x] Queue session save / list / get — QueueSessionService + DTOs + endpoints | P1 | backend |
+| T-07.6 | [x] Shared SessionHistory frontend component (gracefully hidden when backend offline) | P1 | frontend |
+| T-07.7 | [x] EOQ session save UI + history panel with Load button | P1 | frontend |
+| T-07.8 | [x] Break-even session save UI + history panel with Load button | P1 | frontend |
+| T-07.9 | [x] Queue session save UI + history panel with Load button | P1 | frontend |
+| T-07.10 | [x] Backend unit tests for all three session services (TC-07-E01–E04, B01–B04, Q01–Q04) | P1 | test |

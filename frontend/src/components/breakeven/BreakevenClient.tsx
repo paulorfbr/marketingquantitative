@@ -7,6 +7,13 @@ import {
   type BreakevenInputs,
   type BreakevenResult,
 } from '@/lib/breakeven';
+import { SessionHistory, type SessionRow } from '@/components/shared/SessionHistory';
+
+const HISTORY_COLUMNS = [
+  { key: 'breakEvenQty',      label: 'BEQ (units)' },
+  { key: 'breakEvenRevenue',  label: 'BE Revenue', format: (v: unknown) => `$${(v as number).toFixed(2)}` },
+  { key: 'contributionMargin', label: 'Contribution Margin', format: (v: unknown) => `$${(v as number).toFixed(2)}` },
+];
 
 type Field = 'fixedCosts' | 'variableCostPerUnit' | 'pricePerUnit';
 type FormState = Record<Field, string>;
@@ -19,6 +26,9 @@ export default function BreakevenClient() {
   const [result, setResult] = useState<BreakevenResult | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [crossError, setCrossError] = useState<string | null>(null);
+  const [sessionName, setSessionName] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [historyKey, setHistoryKey] = useState(0);
 
   const update = (field: Field, value: string) => {
     setForm(f => ({ ...f, [field]: value }));
@@ -75,6 +85,44 @@ export default function BreakevenClient() {
     setResult(null);
     setFieldErrors({});
     setCrossError(null);
+    setSaveStatus('idle');
+  };
+
+  const saveSession = async () => {
+    if (!result) return;
+    const name = sessionName.trim() || new Date().toLocaleString();
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/breakeven/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          fixedCosts:          Number(form.fixedCosts),
+          variableCostPerUnit: Number(form.variableCostPerUnit),
+          pricePerUnit:        Number(form.pricePerUnit),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setSaveStatus('saved');
+      setHistoryKey(k => k + 1);
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
+
+  const loadSession = (session: SessionRow) => {
+    setForm({
+      fixedCosts:          String(session.fixedCosts ?? ''),
+      variableCostPerUnit: String(session.variableCostPerUnit ?? ''),
+      pricePerUnit:        String(session.pricePerUnit ?? ''),
+    });
+    setResult(null);
+    setFieldErrors({});
+    setCrossError(null);
+    setSaveStatus('idle');
   };
 
   const inputs = toInputs(form);
@@ -188,6 +236,44 @@ export default function BreakevenClient() {
           </div>
         </>
       )}
+
+      {/* Save session */}
+      {result && (
+        <div className="card" style={{ marginTop: 'var(--space-6)' }}>
+          <h2 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)' }}>
+            Save Session
+          </h2>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={sessionName}
+              onChange={e => setSessionName(e.target.value)}
+              placeholder="Session name (optional)"
+              style={{ flex: 1 }}
+            />
+            <button
+              onClick={saveSession}
+              className="btn btn-primary"
+              disabled={saveStatus === 'saving'}
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved ✓' : 'Save'}
+            </button>
+          </div>
+          {saveStatus === 'error' && (
+            <p className="field-error" style={{ marginTop: 'var(--space-2)' }}>
+              Could not reach the backend. Is the server running?
+            </p>
+          )}
+        </div>
+      )}
+
+      <SessionHistory
+        apiPath="/api/breakeven/sessions"
+        refreshKey={historyKey}
+        columns={HISTORY_COLUMNS}
+        onLoad={loadSession}
+      />
     </div>
   );
 }

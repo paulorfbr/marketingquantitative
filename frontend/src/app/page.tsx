@@ -43,10 +43,7 @@ export default function HomePage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
         {tools.map(({ href, title, description }) => (
           <Link key={href} href={href} style={{ textDecoration: 'none' }}>
-            <div className="card" style={{ height: '100%', cursor: 'pointer', transition: 'box-shadow var(--transition-base)' }}
-              onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--shadow-md)')}
-              onMouseLeave={e => (e.currentTarget.style.boxShadow = 'var(--shadow-sm)')}
-            >
+            <div className="card card-hover" style={{ height: '100%' }}>
               <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)', color: 'var(--color-primary-700)', marginBottom: 'var(--space-2)' }}>
                 {title}
               </h2>

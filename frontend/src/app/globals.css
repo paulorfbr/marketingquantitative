@@ -104,6 +104,14 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.card-hover {
+  cursor: pointer;
+  transition: box-shadow var(--transition-base);
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-md);
+}
+
 /* Form elements */
 input[type="text"],
 input[type="number"],

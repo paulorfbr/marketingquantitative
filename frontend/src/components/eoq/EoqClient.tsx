@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { calculateEoq, type EoqResult } from '@/lib/eoq';
+import { SessionHistory, type SessionRow } from '@/components/shared/SessionHistory';
 
 type Field = 'demand' | 'orderingCost' | 'unitCost' | 'holdingRate';
 
@@ -19,10 +20,19 @@ type Errors = Partial<Record<Field, string>>;
 
 const EMPTY: FormState = { demand: '', orderingCost: '', unitCost: '', holdingRate: '' };
 
+const HISTORY_COLUMNS = [
+  { key: 'eoq',           label: 'EOQ (units)' },
+  { key: 'ordersPerYear', label: 'Orders/yr' },
+  { key: 'totalAnnualCost', label: 'Total Cost', format: (v: unknown) => `$${(v as number).toFixed(2)}` },
+];
+
 export default function EoqClient() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [result, setResult] = useState<EoqResult | null>(null);
   const [errors, setErrors] = useState<Errors>({});
+  const [sessionName, setSessionName] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [historyKey, setHistoryKey] = useState(0);
 
   const update = (field: Field, value: string) => {
     setForm(f => ({ ...f, [field]: value }));
@@ -44,19 +54,56 @@ export default function EoqClient() {
   const calculate = () => {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
     setErrors({});
     setResult(
       calculateEoq({
         demand:       Number(form.demand),
         orderingCost: Number(form.orderingCost),
         unitCost:     Number(form.unitCost),
-        holdingRate:  Number(form.holdingRate) / 100, // convert % → decimal
+        holdingRate:  Number(form.holdingRate) / 100,
       })
     );
   };
 
-  const clear = () => { setForm(EMPTY); setResult(null); setErrors({}); };
+  const clear = () => { setForm(EMPTY); setResult(null); setErrors({}); setSaveStatus('idle'); };
+
+  const saveSession = async () => {
+    if (!result) return;
+    const name = sessionName.trim() || new Date().toLocaleString();
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/eoq/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          demand:       Number(form.demand),
+          orderingCost: Number(form.orderingCost),
+          unitCost:     Number(form.unitCost),
+          holdingRate:  Number(form.holdingRate) / 100,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setSaveStatus('saved');
+      setHistoryKey(k => k + 1);
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
+
+  const loadSession = (session: SessionRow) => {
+    setForm({
+      demand:       String(session.demand ?? ''),
+      orderingCost: String(session.orderingCost ?? ''),
+      unitCost:     String(session.unitCost ?? ''),
+      holdingRate:  String(((session.holdingRate as number) * 100).toFixed(4)),
+    });
+    setResult(null);
+    setErrors({});
+    setSaveStatus('idle');
+  };
 
   return (
     <div>
@@ -130,27 +177,10 @@ export default function EoqClient() {
           {result ? (
             <table className="result-table">
               <tbody>
-                <ResultRow
-                  label="Economic Order Quantity (EOQ)"
-                  value={result.eoq.toFixed(2)}
-                  unit="units"
-                  highlight
-                />
-                <ResultRow
-                  label="Orders per Year"
-                  value={result.ordersPerYear.toFixed(2)}
-                  unit="orders / year"
-                />
-                <ResultRow
-                  label="Cycle Time"
-                  value={result.cycleDays.toFixed(2)}
-                  unit="days"
-                />
-                <ResultRow
-                  label="Total Annual Cost"
-                  value={`$${result.totalAnnualCost.toFixed(2)}`}
-                  unit="/ year"
-                />
+                <ResultRow label="Economic Order Quantity (EOQ)" value={result.eoq.toFixed(2)} unit="units" highlight />
+                <ResultRow label="Orders per Year"   value={result.ordersPerYear.toFixed(2)} unit="orders / year" />
+                <ResultRow label="Cycle Time"        value={result.cycleDays.toFixed(2)}     unit="days" />
+                <ResultRow label="Total Annual Cost" value={`$${result.totalAnnualCost.toFixed(2)}`} unit="/ year" />
               </tbody>
             </table>
           ) : (
@@ -169,6 +199,44 @@ export default function EoqClient() {
           <CostBreakdown result={result} holdingRate={Number(form.holdingRate) / 100} unitCost={Number(form.unitCost)} />
         </div>
       )}
+
+      {/* Save session */}
+      {result && (
+        <div className="card" style={{ marginTop: 'var(--space-6)' }}>
+          <h2 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-3)' }}>
+            Save Session
+          </h2>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={sessionName}
+              onChange={e => setSessionName(e.target.value)}
+              placeholder="Session name (optional)"
+              style={{ flex: 1 }}
+            />
+            <button
+              onClick={saveSession}
+              className="btn btn-primary"
+              disabled={saveStatus === 'saving'}
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved ✓' : 'Save'}
+            </button>
+          </div>
+          {saveStatus === 'error' && (
+            <p className="field-error" style={{ marginTop: 'var(--space-2)' }}>
+              Could not reach the backend. Is the server running?
+            </p>
+          )}
+        </div>
+      )}
+
+      <SessionHistory
+        apiPath="/api/eoq/sessions"
+        refreshKey={historyKey}
+        columns={HISTORY_COLUMNS}
+        onLoad={loadSession}
+      />
     </div>
   );
 }
@@ -188,10 +256,6 @@ function ResultRow({ label, value, unit, highlight }: { label: string; value: st
 }
 
 function CostBreakdown({ result, holdingRate, unitCost }: { result: EoqResult; holdingRate: number; unitCost: number }) {
-  const ordering = result.ordersPerYear * (result.totalAnnualCost / (result.ordersPerYear + (result.eoq / 2) * holdingRate * unitCost / (result.totalAnnualCost / result.ordersPerYear)));
-  const orderingCost = result.ordersPerYear * (result.totalAnnualCost / result.ordersPerYear - (result.eoq / 2) * holdingRate * unitCost / result.ordersPerYear);
-
-  // At EOQ, ordering cost = holding cost = totalAnnualCost / 2
   const halfCost = result.totalAnnualCost / 2;
   const pct = (v: number) => ((v / result.totalAnnualCost) * 100).toFixed(1);
 
