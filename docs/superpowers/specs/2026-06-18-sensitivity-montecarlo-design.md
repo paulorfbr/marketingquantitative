@@ -67,6 +67,7 @@ Both client components follow the established pattern: `useState` for form/resul
 - Bars are sorted by impact magnitude (`highValue - lowValue`) descending — widest bar at top.
 - Backend varies one input at a time across `[base × (1 - variationPercent/100), base × (1 + variationPercent/100)]` while holding all others at base.
 - Delegates to `EoqService` or `BreakevenService` for each calculation.
+- Input keys are model-specific and validated server-side: Break-even expects `cf`, `cvu`, `price`; EOQ expects `demand`, `orderingCost`, `unitCost`, `holdingRate`. Unknown keys are rejected with 400.
 
 ---
 
@@ -133,6 +134,7 @@ src/main/java/.../
     OutputMetric.java             — enum: BREAKEVEN_QUANTITY, EOQ_QUANTITY
     DistributionType.java         — enum: NORMAL, UNIFORM, TRIANGULAR
     InputDistribution.java        — record { DistributionType distribution, Double mean, Double stdDev, Double min, Double max, Double mode }
+                                    All fields nullable; service validates required fields per distribution type at runtime
 ```
 
 **No Flyway migrations** — stateless compute endpoints, no persistence.
