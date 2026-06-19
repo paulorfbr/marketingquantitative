@@ -43,7 +43,7 @@ class EoqSessionServiceTest {
 
         assertThat(response.name()).isEqualTo("Test");
         assertThat(response.eoq()).isEqualTo(223.61);
-        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.id()).isNull(); // stub entity has no JPA-assigned id
         verify(repository).save(any());
     }
 
