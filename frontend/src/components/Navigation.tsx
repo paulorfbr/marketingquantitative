@@ -10,6 +10,7 @@ const tools = [
   { href: '/breakeven',      label: 'Break-even' },
   { href: '/queue',          label: 'Attention Queue' },
   { href: '/decision-tree',  label: 'Decision Tree' },
+  { href: '/sensitivity',    label: 'Sensitivity' },
 ];
 
 export default function Navigation() {
