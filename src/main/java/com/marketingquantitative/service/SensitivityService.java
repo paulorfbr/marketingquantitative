@@ -28,7 +28,7 @@ public class SensitivityService {
     @Transactional(readOnly = true)
     public SensitivityResponse calculate(SensitivityRequest request) {
         Set<String> valid = VALID_KEYS.get(request.model());
-        if (!valid.equals(request.baseInputs().keySet())) {
+        if (valid == null || !valid.equals(request.baseInputs().keySet())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "baseInputs keys must be exactly " + valid + " for model " + request.model());
         }

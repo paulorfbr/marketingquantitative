@@ -1,6 +1,5 @@
 package com.marketingquantitative.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketingquantitative.service.SensitivityService;
 import com.marketingquantitative.service.SensitivitySessionService;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SensitivityControllerTest {
 
     @Autowired MockMvc mvc;
-    @Autowired ObjectMapper mapper;
     @MockBean SensitivityService sensitivityService;
     @MockBean SensitivitySessionService sensitivitySessionService;
 

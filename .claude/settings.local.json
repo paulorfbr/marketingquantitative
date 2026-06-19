@@ -18,7 +18,23 @@
       "mcp__playwright__browser_take_screenshot",
       "Bash(claude mcp *)",
       "Skill(update-config)",
-      "Bash(Remove-Item \"C:\\\\Users\\\\User\\\\IdeaProjects\\\\MarketingQuantitative\\\\frontend\\\\next.config.ts\" -Force)"
+      "Bash(Remove-Item \"C:\\\\Users\\\\User\\\\IdeaProjects\\\\MarketingQuantitative\\\\frontend\\\\next.config.ts\" -Force)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git -C \"C:/Users/User/IdeaProjects/MarketingQuantitative\" rev-parse --git-path sdd)",
+      "Bash(cat \"$\\(git -C \"C:/Users/User/IdeaProjects/MarketingQuantitative\" rev-parse --git-path sdd\\)/progress.md\")",
+      "Bash(mkdir -p \"C:/Users/User/IdeaProjects/MarketingQuantitative/.git/sdd\")",
+      "Bash(echo \"# SDD Progress Ledger — Sensitivity & Monte Carlo \\(2026-06-18\\)\")",
+      "Bash(git *)",
+      "Bash(bash *)",
+      "Bash(mkdir -p \"C:/Users/User/IdeaProjects/MarketingQuantitative/docs/superpowers/specs\")",
+      "Bash(mkdir -p \"C:/Users/User/IdeaProjects/MarketingQuantitative/specs/use-cases/sensitivity_montecarlo\")",
+      "PowerShell(java *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Java\\\\jdk-24\\\\bin\\\\java.exe\" -version 2>&1)",
+      "PowerShell(mvn test *)",
+      "PowerShell(mvn *)",
+      "PowerShell(mvn install:install-file *)",
+      "Bash(export JAVA_HOME=\"C:\\\\Program Files\\\\Java\\\\jdk-24\")"
     ]
   }
 }
