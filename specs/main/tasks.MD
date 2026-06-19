@@ -120,3 +120,26 @@ Priority: **P1** = must-have for v1.0 · **P2** = nice-to-have
 | T-07.8 | [x] Break-even session save UI + history panel with Load button | P1 | frontend |
 | T-07.9 | [x] Queue session save UI + history panel with Load button | P1 | frontend |
 | T-07.10 | [x] Backend unit tests for all three session services (TC-07-E01–E04, B01–B04, Q01–Q04) | P1 | test |
+
+---
+
+## Milestone 8 — Sensitivity Analysis & Monte Carlo Simulation
+
+| # | Task | Priority | Layer |
+|---|------|----------|-------|
+| T-08.1 | [ ] `SensitivityRequest` / `SensitivityResponse` / `ParameterSensitivity` DTOs with Bean Validation | P1 | backend |
+| T-08.2 | [ ] `SensitivityService` — vary each param ±swingPercent, call EoqService/BreakevenService, sort by impact | P1 | backend |
+| T-08.3 | [ ] `POST /api/sensitivity/calculate` endpoint (`SensitivityController`) | P1 | backend |
+| T-08.4 | [ ] `MonteCarloRequest` / `MonteCarloResponse` DTOs with Bean Validation | P1 | backend |
+| T-08.5 | [ ] `MonteCarloService` — N-iteration sampling (Normal/Uniform/Triangular), CDF array + summary stats | P1 | backend |
+| T-08.6 | [ ] `POST /api/montecarlo/simulate` endpoint (`MonteCarloController`) | P1 | backend |
+| T-08.7 | [ ] Flyway migration: `sensitivity_session` + `montecarlo_session` tables | P1 | backend |
+| T-08.8 | [ ] JPA entities + Spring Data repositories for both session types | P1 | backend |
+| T-08.9 | [ ] `SensitivitySessionService` + DTOs + session endpoints (save / list / get) | P1 | backend |
+| T-08.10 | [ ] `MonteCarloSessionService` + DTOs + session endpoints (save / list / get) | P1 | backend |
+| T-08.11 | [ ] Unit tests: SensitivityService, MonteCarloService, both session services, controller slice validation | P1 | test |
+| T-08.12 | [ ] `/sensitivity` page — model selector, base inputs, swing % field, tornado chart (SVG) | P1 | frontend |
+| T-08.13 | [ ] `/montecarlo` page — model selector, distribution inputs per param, iterations field, CDF chart (SVG), stats card | P1 | frontend |
+| T-08.14 | [ ] Session save/load UI for both pages (SessionHistory component) | P1 | frontend |
+| T-08.15 | [ ] Add `/sensitivity` and `/montecarlo` to `Navigation.tsx` | P1 | frontend |
+| T-08.16 | [ ] Playwright E2E smoke tests for `/sensitivity` and `/montecarlo` happy paths | P2 | test |
