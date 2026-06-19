@@ -11,6 +11,7 @@ const tools = [
   { href: '/queue',          label: 'Attention Queue' },
   { href: '/decision-tree',  label: 'Decision Tree' },
   { href: '/sensitivity',    label: 'Sensitivity' },
+  { href: '/montecarlo',    label: 'Monte Carlo' },
 ];
 
 export default function Navigation() {
