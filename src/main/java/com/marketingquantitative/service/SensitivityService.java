@@ -4,7 +4,6 @@ import com.marketingquantitative.dto.*;
 import com.marketingquantitative.shared.ModelType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -25,7 +24,6 @@ public class SensitivityService {
         this.breakevenService = breakevenService;
     }
 
-    @Transactional(readOnly = true)
     public SensitivityResponse calculate(SensitivityRequest request) {
         Set<String> valid = VALID_KEYS.get(request.model());
         if (valid == null || !valid.equals(request.baseInputs().keySet())) {

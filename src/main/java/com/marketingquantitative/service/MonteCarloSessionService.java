@@ -45,7 +45,7 @@ public class MonteCarloSessionService {
             );
             return toResponse(repository.save(session));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize session", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save session", e);
         }
     }
 
@@ -75,7 +75,7 @@ public class MonteCarloSessionService {
                 s.getId(), s.getName(), ModelType.valueOf(s.getModel()),
                 inputs, s.getIterations(), results, s.getCreatedAt());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to deserialize session", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to load session", e);
         }
     }
 }

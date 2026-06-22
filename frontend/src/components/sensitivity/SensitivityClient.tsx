@@ -126,7 +126,9 @@ export default function SensitivityClient() {
       setSwing(String(full.swingPercent));
       setResult(full.results);
       setError(null);
-    } catch { /* silent */ }
+    } catch {
+      setError('Could not load session. Is the backend running?');
+    }
   };
 
   const HISTORY_COLUMNS = [

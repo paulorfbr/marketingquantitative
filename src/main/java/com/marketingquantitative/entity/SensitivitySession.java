@@ -12,9 +12,9 @@ public class SensitivitySession {
 
     @Column(nullable = false)                            private String name;
     @Column(nullable = false)                            private String model;
-    @Column(nullable = false, columnDefinition = "text") private String baseInputsJson;
+    @Column(name = "base_inputs", nullable = false, columnDefinition = "text") private String baseInputsJson;
     @Column(nullable = false)                            private Double swingPercent;
-    @Column(nullable = false, columnDefinition = "text") private String resultsJson;
+    @Column(name = "results", nullable = false, columnDefinition = "text") private String resultsJson;
     @Column(nullable = false, updatable = false)         private Instant createdAt;
 
     protected SensitivitySession() {}
