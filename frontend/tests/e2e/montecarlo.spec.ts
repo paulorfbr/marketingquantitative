@@ -44,4 +44,37 @@ test.describe('Monte Carlo Simulation — happy path', () => {
     const numberInputs = page.locator('input[type="number"]');
     await expect(numberInputs).toHaveCount(7);
   });
+
+  test('simulates EOQ Monte Carlo and renders CDF chart', async ({ page }) => {
+    // Mock the simulate endpoint
+    await page.route('/api/montecarlo/simulate', async route => {
+      const cdfValues = Array.from({ length: 200 }, (_, i) => 100 + i * 2);
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          cdfValues,
+          mean: 300.0,
+          stdDev: 50.0,
+          p5: 180.0,
+          p25: 240.0,
+          p50: 300.0,
+          p75: 360.0,
+          p95: 420.0
+        })
+      });
+    });
+
+    // Fill NORMAL dist fields for all EOQ parameters (4 fields × 2 inputs = indices 0-7)
+    const inputs = page.locator('input[type="number"]');
+    await inputs.nth(0).fill('1000'); await inputs.nth(1).fill('50');
+    await inputs.nth(2).fill('50');   await inputs.nth(3).fill('5');
+    await inputs.nth(4).fill('10');   await inputs.nth(5).fill('1');
+    await inputs.nth(6).fill('0.2');  await inputs.nth(7).fill('0.02');
+
+    await page.getByRole('button', { name: 'Simulate' }).click();
+
+    await expect(page.locator('svg')).toBeVisible();
+    await expect(page.getByText('300.00').first()).toBeVisible(); // mean
+  });
 });

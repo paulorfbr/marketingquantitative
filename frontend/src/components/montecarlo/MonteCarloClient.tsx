@@ -46,15 +46,18 @@ export default function MonteCarloClient() {
     setDists(prev => ({ ...prev, [f]: { ...getDist(f), ...patch } }));
 
   const buildInputs = () => {
-    const out: Record<string, object> = {};
+    const out: Record<string, unknown> = {};
     for (const f of fields) {
       const d = getDist(f);
       const num = (s: string) => s === '' ? null : Number(s);
-      out[f] = {
-        distribution: d.type,
-        mean: num(d.mean), stdDev: num(d.stdDev),
-        min: num(d.min), max: num(d.max), mode: num(d.mode),
-      };
+      const base = { distribution: d.type, mean: null, stdDev: null, min: null, max: null, mode: null };
+      if (d.type === 'NORMAL') {
+        out[f] = { ...base, mean: num(d.mean), stdDev: num(d.stdDev) };
+      } else if (d.type === 'UNIFORM') {
+        out[f] = { ...base, min: num(d.min), max: num(d.max) };
+      } else {
+        out[f] = { ...base, min: num(d.min), max: num(d.max), mode: num(d.mode) };
+      }
     }
     return out;
   };
@@ -120,7 +123,9 @@ export default function MonteCarloClient() {
       setDists(newDists);
       setResult(full.results);
       setError(null);
-    } catch { /* silent */ }
+    } catch {
+      setError('Could not load session. Is the backend running?');
+    }
   };
 
   const HISTORY_COLUMNS = [
