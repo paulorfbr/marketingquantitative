@@ -1,18 +1,60 @@
 # Marketing Quantitative
 
-A browser-first toolkit of five quantitative marketing analysis tools. All calculations run in the browser with no server required. An optional Spring Boot backend adds a REST API and session persistence to PostgreSQL.
+A browser-first toolkit of seven quantitative analysis tools for operations research and decision-making. All calculations run in the browser with no server required. An optional Spring Boot backend adds a REST API and session persistence to PostgreSQL.
 
 ---
 
 ## Tools
 
-| Tool | Formula / Method | Route |
-|------|-----------------|-------|
-| **Matrix Gains** | Maxi-max and maxi-min payoff criteria | `/matrix-gains` |
-| **Economic Order Quantity** | Q* = sqrt(2DS / IC) | `/eoq` |
-| **Break-even Analysis** | Q_BE = CF / (P - CVu) | `/breakeven` |
-| **Attention Queue (M/M/s)** | Steady-state queue metrics: rho, P0, Lq, L, Wq, W | `/queue` |
-| **Decision Tree** | EMV via backwards induction | `/decision-tree` |
+### Matrix Gains — `/matrix-gains`
+
+Evaluate strategies under uncertainty using the **maxi-max** (optimistic) and **maxi-min** (pessimistic) criteria. Enter payoff values for any number of strategies and scenarios — the result rows highlight the optimal strategy for each criterion.
+
+![Matrix Gains](marketing/gainsMatrix.png)
+
+---
+
+### Economic Order Quantity — `/eoq`
+
+Find the order quantity that **minimises total annual ordering and holding costs** using the formula `EOQ = √(2DS / IC)`. Returns EOQ, orders per year, cycle time, total annual cost, and a cost breakdown showing how ordering and holding costs balance at the optimum.
+
+![Economic Order Quantity](marketing/economicOrderQuantity.png)
+
+---
+
+### Break-even Analysis — `/breakeven`
+
+Find the **quantity and revenue at which total costs equal total revenue** using `Q_BE = CF / (P − CVu)`. Outputs break-even quantity, break-even revenue, contribution margin, and margin ratio, plus an SVG cost vs. revenue chart with the break-even point marked.
+
+![Break-even Analysis](marketing/breakEvenAnalysis.png)
+
+---
+
+### Attention Queue (M/M/s) — `/queue`
+
+Compute **steady-state metrics for a multi-server queue** given arrival rate λ, service rate μ, and number of servers s. Returns server utilisation ρ, average customers in queue (Lq) and system (L), average wait time in queue (Wq) and system (W). Warns when the stability condition `s × μ > λ` is violated.
+
+![Attention Queue — M/M/s](marketing/attentionQueueMCustomerMServiceSservers.png)
+
+---
+
+### Decision Tree — `/decision-tree`
+
+Build decision trees interactively with **decision nodes** (□) and **chance nodes** (○), then run **backwards induction** to find the optimal path by Expected Monetary Value (EMV). Results are shown as a labelled SVG diagram with the optimal path highlighted.
+
+![Decision Tree](marketing/decisionTree.png)
+
+---
+
+### Sensitivity Analysis — `/sensitivity`
+
+Understand which inputs drive the most output variance by varying each one independently ±swing%. Results appear as a **tornado chart** (SVG) — bars sorted by impact magnitude — for both EOQ and Break-even models. Supports session save/load.
+
+---
+
+### Monte Carlo Simulation — `/montecarlo`
+
+Assign a probability distribution (**Normal**, **Uniform**, or **Triangular**) to each model input and run up to 100,000 iterations to estimate the full output distribution. Returns a **CDF chart** (SVG) with P5/P95 reference lines and a summary statistics card (mean, std dev, P5–P95) for both EOQ and Break-even models. Supports session save/load.
 
 ---
 
@@ -63,7 +105,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. All five tools work immediately — calculations run in the browser.
+Open http://localhost:3000. All seven tools work immediately — calculations run in the browser.
 
 ### With backend (adds REST API + session history)
 
