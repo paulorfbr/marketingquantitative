@@ -48,13 +48,21 @@ Build decision trees interactively with **decision nodes** (□) and **chance no
 
 ### Sensitivity Analysis — `/sensitivity`
 
-Understand which inputs drive the most output variance by varying each one independently ±swing%. Results appear as a **tornado chart** (SVG) — bars sorted by impact magnitude — for both EOQ and Break-even models. Supports session save/load.
+Vary each input independently by ±swing% to identify which parameters drive the most output uncertainty. The **tornado chart** (SVG) ranks parameters by impact magnitude — widest bar at the top means that input is the biggest lever on the result. The results table shows the exact low output, high output, and impact for each parameter at the chosen swing. Supports both EOQ and Break-even models, with session save/load.
+
+> In the example below, `unitCost` and `holdingRate` each produce a ±29-unit swing on the EOQ output of 141.42 when varied ±20%, making them the dominant drivers — while `demand` and `orderingCost` have nearly equal but slightly smaller impact.
+
+![Sensitivity Analysis](marketing/sensitivyAnalysis.png)
 
 ---
 
 ### Monte Carlo Simulation — `/montecarlo`
 
-Assign a probability distribution (**Normal**, **Uniform**, or **Triangular**) to each model input and run up to 100,000 iterations to estimate the full output distribution. Returns a **CDF chart** (SVG) with P5/P95 reference lines and a summary statistics card (mean, std dev, P5–P95) for both EOQ and Break-even models. Supports session save/load.
+Assign a probability distribution (**Normal**, **Uniform**, or **Triangular**) to each model input and run up to 100,000 iterations simultaneously to estimate the full probability distribution of the output. The **CDF chart** (SVG) shows cumulative probability vs. output value, with dashed P5 and P95 reference lines marking the 90% confidence interval. The summary card reports mean, std dev, and five percentile markers (P5, P25, P50, P75, P95). Supports both EOQ and Break-even models, with session save/load.
+
+> In the example below, with all four EOQ parameters modelled as Normal distributions (demand μ=500 σ=25, ordering cost μ=100 σ=25, unit cost μ=25 σ=5, holding rate μ=50 σ=10), the simulation estimates a median EOQ of **8.88** with a 90% confidence interval of **6.76 – 12.53**.
+
+![Monte Carlo Simulation](marketing/montecarlo.png)
 
 ---
 
