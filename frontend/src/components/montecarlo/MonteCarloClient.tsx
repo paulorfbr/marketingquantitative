@@ -62,12 +62,32 @@ export default function MonteCarloClient() {
     return out;
   };
 
+  const validateInputs = (): string | null => {
+    for (const f of fields) {
+      const d = getDist(f);
+      const label = FIELD_LABELS[f];
+      if (d.type === 'NORMAL') {
+        if (d.mean === '' || d.stdDev === '') return `${label}: mean and std dev are required.`;
+        if (Number(d.stdDev) <= 0) return `${label}: std dev must be > 0.`;
+      } else if (d.type === 'UNIFORM') {
+        if (d.min === '' || d.max === '') return `${label}: min and max are required.`;
+        if (Number(d.min) >= Number(d.max)) return `${label}: min must be less than max.`;
+      } else {
+        if (d.min === '' || d.max === '' || d.mode === '') return `${label}: min, max and mode are required.`;
+        if (Number(d.min) > Number(d.mode) || Number(d.mode) > Number(d.max)) return `${label}: must satisfy min ≤ mode ≤ max.`;
+      }
+    }
+    return null;
+  };
+
   const simulate = async () => {
     setError(null);
     const iter = Number(iterations);
     if (!iterations || isNaN(iter) || iter < 1 || iter > 100000) {
       setError('Iterations must be between 1 and 100,000.'); return;
     }
+    const validationError = validateInputs();
+    if (validationError) { setError(validationError); return; }
     setLoading(true);
     try {
       const res = await fetch('/api/montecarlo/simulate', {
@@ -127,6 +147,8 @@ export default function MonteCarloClient() {
       setError('Could not load session. Is the backend running?');
     }
   };
+
+  const fmt = (v: unknown) => (typeof v === 'number' && isFinite(v)) ? v.toFixed(2) : '—';
 
   const HISTORY_COLUMNS = [
     { key: 'model', label: 'Model' },
@@ -238,14 +260,14 @@ export default function MonteCarloClient() {
           {result ? (
             <table className="result-table">
               <tbody>
-                <tr><td style={{ textAlign: 'left' }}>Mean</td><td>{result.mean.toFixed(2)}</td></tr>
-                <tr><td style={{ textAlign: 'left' }}>Std Dev</td><td>{result.stdDev.toFixed(2)}</td></tr>
-                <tr><td style={{ textAlign: 'left' }}>P5</td><td>{result.p5.toFixed(2)}</td></tr>
-                <tr><td style={{ textAlign: 'left' }}>P25</td><td>{result.p25.toFixed(2)}</td></tr>
+                <tr><td style={{ textAlign: 'left' }}>Mean</td><td>{fmt(result.mean)}</td></tr>
+                <tr><td style={{ textAlign: 'left' }}>Std Dev</td><td>{fmt(result.stdDev)}</td></tr>
+                <tr><td style={{ textAlign: 'left' }}>P5</td><td>{fmt(result.p5)}</td></tr>
+                <tr><td style={{ textAlign: 'left' }}>P25</td><td>{fmt(result.p25)}</td></tr>
                 <tr><td style={{ textAlign: 'left', fontWeight: 'var(--font-semibold)' }}>P50 (Median)</td>
-                  <td style={{ fontWeight: 'var(--font-bold)', color: 'var(--color-primary-700)' }}>{result.p50.toFixed(2)}</td></tr>
-                <tr><td style={{ textAlign: 'left' }}>P75</td><td>{result.p75.toFixed(2)}</td></tr>
-                <tr><td style={{ textAlign: 'left' }}>P95</td><td>{result.p95.toFixed(2)}</td></tr>
+                  <td style={{ fontWeight: 'var(--font-bold)', color: 'var(--color-primary-700)' }}>{fmt(result.p50)}</td></tr>
+                <tr><td style={{ textAlign: 'left' }}>P75</td><td>{fmt(result.p75)}</td></tr>
+                <tr><td style={{ textAlign: 'left' }}>P95</td><td>{fmt(result.p95)}</td></tr>
               </tbody>
             </table>
           ) : (
