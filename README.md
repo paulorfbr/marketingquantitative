@@ -111,18 +111,27 @@ Open http://localhost:3000. All seven tools work immediately — calculations ru
 
 **1. Create the database**
 
+Connect to your local PostgreSQL instance and create the database. Default connection assumes port `5433`, user `postgres`, password `admin` — adjust the flags to match your setup:
+
 ```bash
-psql -U postgres -c "CREATE DATABASE prixstrategie;"
+psql -U postgres -p 5433 -c "CREATE DATABASE marketingquantitative;"
 ```
 
-**2. Set credentials** (skip if using the default `postgres` / `postgres`)
+**2. Set credentials** (skip if your setup matches the defaults below)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_USERNAME` | `postgres` | PostgreSQL username |
+| `DB_PASSWORD` | `admin` | PostgreSQL password |
+| `DB_PORT` | `5433` | PostgreSQL port |
 
 ```bash
 export DB_USERNAME=your_user
 export DB_PASSWORD=your_password
+export DB_PORT=5432        # change if your Postgres runs on the standard port
 ```
 
-**3. Start the backend** — Flyway runs migrations automatically on startup
+**3. Start the backend** — Flyway runs all migrations automatically on startup
 
 ```bash
 mvn spring-boot:run
