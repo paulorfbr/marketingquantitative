@@ -26,6 +26,16 @@ const tools = [
     title: 'Decision Tree',
     description: 'Build decision trees and compute Expected Monetary Value via backwards induction.',
   },
+  {
+    href: '/sensitivity',
+    title: 'Sensitivity Analysis',
+    description: 'Vary each input ±swing% to rank parameters by impact on the output — visualised as a tornado chart.',
+  },
+  {
+    href: '/montecarlo',
+    title: 'Monte Carlo Simulation',
+    description: 'Assign distributions to inputs and run up to 100,000 iterations to estimate the full output distribution via a CDF chart.',
+  },
 ];
 
 export default function HomePage() {
@@ -36,7 +46,7 @@ export default function HomePage() {
           Marketing Quantitative Tools
         </h1>
         <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-neutral-600)' }}>
-          Analytical decision-support tools for marketing managers and analysts.
+          Seven analytical decision-support tools for marketing managers and analysts.
         </p>
       </div>
 
